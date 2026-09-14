@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Browser Monitoring Test</title>
+</head>
+<body>
+
+    <h1>Browser Monitoring Test Page</h1>
+
+    <button onclick="document.documentElement.requestFullscreen()">
+        Enter Fullscreen
+    </button>
+    
+    <p>
+        Copy, paste, cut, right-click, or change browser tabs
+        to test the monitoring system.
+    </p>
+
+    <textarea
+        id="testText"
+        rows="5"
+        cols="50"
+        placeholder="Type or paste text here">
+    </textarea>
+
+    <script src="../src/monitoring/browserMonitor.js"></script>
+
+</body>
+</html>

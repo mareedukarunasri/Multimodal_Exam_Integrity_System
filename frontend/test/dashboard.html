@@ -1,0 +1,2328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Exam Integrity Dashboard</title>
+
+    <style>
+
+        /* =================================================
+           GLOBAL
+        ================================================= */
+
+        :root {
+            font-family:
+                Inter,
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            color: #17202a;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef4f9 0%,
+                    #f7f9fc 50%,
+                    #eef2f7 100%
+                );
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            max-width: 1400px;
+
+            margin: 0 auto;
+
+            padding: 28px;
+
+            background: transparent;
+        }
+
+
+        /* =================================================
+           HEADER
+        ================================================= */
+
+        header {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 20px;
+
+            padding: 22px 24px;
+
+            margin-bottom: 18px;
+
+            border-radius: 16px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #102a43,
+                    #1769aa
+                );
+
+            box-shadow:
+                0 10px 30px #102a4326;
+        }
+
+        header h1 {
+            margin: 0;
+
+            font-size: 28px;
+
+            letter-spacing: -0.5px;
+        }
+
+        header h1::before {
+            content: "🛡️ ";
+
+        }
+
+
+        /* =================================================
+           BUTTON
+        ================================================= */
+
+        button {
+            border: 0;
+
+            border-radius: 10px;
+
+            padding: 11px 18px;
+
+            color: white;
+
+            background: #0b5cab;
+
+            font-size: 14px;
+
+            font-weight: 700;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 4px 12px #00000025;
+
+            transition:
+                transform 0.15s ease,
+                background 0.15s ease;
+        }
+
+        button:hover {
+            background: #084b8d;
+
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+
+            cursor: wait;
+
+            transform: none;
+        }
+
+
+        /* =================================================
+           STATUS
+        ================================================= */
+
+        .status {
+            min-height: 24px;
+
+            margin: 10px 4px 18px;
+
+            color: #52606d;
+
+            font-size: 14px;
+
+            font-weight: 600;
+        }
+
+
+        /* =================================================
+           HEADINGS
+        ================================================= */
+
+        h2 {
+            margin:
+                32px 0
+                14px;
+
+            color: #102a43;
+
+            font-size: 20px;
+
+            letter-spacing: -0.2px;
+        }
+
+        .section-note {
+            color: #627d98;
+
+            margin-top: -6px;
+
+            margin-bottom: 14px;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+        }
+
+
+        /* =================================================
+           SESSION PANEL
+        ================================================= */
+
+        .session-panel {
+            position: relative;
+
+            overflow: hidden;
+
+            background: white;
+
+            border-radius: 16px;
+
+            padding: 22px 24px;
+
+            margin-top: 10px;
+
+            box-shadow:
+                0 5px 20px #102a4312;
+
+            border: 1px solid #d9e2ec;
+
+            border-left:
+                5px solid #1769aa;
+        }
+
+        .session-panel::after {
+            content: "ACTIVE SESSION";
+
+            position: absolute;
+
+            top: 18px;
+
+            right: 20px;
+
+            padding: 5px 9px;
+
+            border-radius: 20px;
+
+            color: #1769aa;
+
+            background: #e8f2fb;
+
+            font-size: 11px;
+
+            font-weight: 800;
+
+            letter-spacing: 0.5px;
+        }
+
+        .session-panel h2 {
+            margin-top: 0;
+
+            margin-bottom: 16px;
+        }
+
+        .session-panel p {
+            margin: 9px 0;
+
+            color: #52606d;
+        }
+
+        .session-panel strong {
+            color: #1769aa;
+        }
+
+        .session-id {
+            display: inline-block;
+
+            max-width: 75%;
+
+            margin-left: 5px;
+
+            font-family: monospace;
+
+            word-break: break-all;
+
+            font-weight: bold;
+
+            color: #102a43 !important;
+        }
+
+
+        /* =================================================
+           SUMMARY CARDS
+        ================================================= */
+
+        .cards {
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(180px, 1fr)
+                );
+
+            gap: 16px;
+        }
+
+        .card {
+            position: relative;
+
+            overflow: hidden;
+
+            background: white;
+
+            border-radius: 14px;
+
+            padding: 20px;
+
+            border:
+                1px solid #d9e2ec;
+
+            box-shadow:
+                0 5px 18px #102a4310;
+
+            transition:
+                transform 0.18s ease,
+                box-shadow 0.18s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 10px 25px #102a4318;
+        }
+
+        .card::before {
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+
+            top: 0;
+
+            width: 100%;
+
+            height: 4px;
+
+            background: #1769aa;
+        }
+
+        .card:nth-child(2)::before {
+            background: #d32f2f;
+        }
+
+        .card:nth-child(3)::before {
+            background: #f59e0b;
+        }
+
+        .card:nth-child(4)::before {
+            background: #1769aa;
+        }
+
+        .card:nth-child(5)::before {
+            background: #2e7d32;
+        }
+
+        .card p {
+            margin: 2px 0 10px;
+
+            color: #627d98;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.4px;
+        }
+
+        .card strong {
+            display: block;
+
+            font-size: 32px;
+
+            line-height: 1;
+
+            color: #102a43;
+        }
+
+        .card:nth-child(2) strong {
+            color: #c62828;
+        }
+
+        .card:nth-child(3) strong {
+            color: #a15c00;
+        }
+
+        .card:nth-child(4) strong {
+            color: #1769aa;
+        }
+
+        .card:nth-child(5) strong {
+            color: #237a3b;
+        }
+
+
+        /* =================================================
+           PANELS
+        ================================================= */
+
+        .panel {
+            background: white;
+
+            border-radius: 16px;
+
+            padding: 22px;
+
+            border:
+                1px solid #d9e2ec;
+
+            box-shadow:
+                0 5px 20px #102a4310;
+        }
+
+
+        /* =================================================
+           RISK CARDS
+        ================================================= */
+
+        .risk-cards {
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(180px, 1fr)
+                );
+
+            gap: 16px;
+
+            margin-bottom: 14px;
+        }
+
+        .risk-card {
+            position: relative;
+
+            overflow: hidden;
+
+            background: white;
+
+            border-radius: 14px;
+
+            padding: 20px;
+
+            border:
+                1px solid #d9e2ec;
+
+            box-shadow:
+                0 5px 18px #102a4310;
+
+            transition:
+                transform 0.18s ease;
+        }
+
+        .risk-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .risk-card::before {
+            content: "";
+
+            position: absolute;
+
+            left: 0;
+
+            top: 0;
+
+            bottom: 0;
+
+            width: 5px;
+
+            background: #1769aa;
+        }
+
+        .risk-card p {
+            margin: 0 0 10px;
+
+            color: #627d98;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.4px;
+        }
+
+        .risk-card strong {
+            font-size: 32px;
+
+            color: #102a43;
+        }
+
+        .risk-card:nth-child(2)::before {
+            background: #7b1fa2;
+        }
+
+        .risk-card:nth-child(3)::before {
+            background: #a15c00;
+        }
+
+        .risk-card:nth-child(4)::before {
+            background: #7b1fa2;
+        }
+
+
+        /* =================================================
+           BEHAVIOUR CARD
+        ================================================= */
+
+        .behaviour-card {
+            border-left: 0;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffffff,
+                    #fff9f0
+                );
+        }
+
+        .behaviour-card::before {
+            background: #a15c00;
+        }
+
+
+        /* =================================================
+           ML CARD
+        ================================================= */
+
+        .ml-card {
+            border-left: 0;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #ffffff,
+                    #faf4ff
+                );
+        }
+
+        .ml-card::before {
+            background: #7b1fa2;
+        }
+
+
+        /* =================================================
+           FINAL RISK CARD
+        ================================================= */
+
+        .final-card {
+            border:
+                2px solid #1769aa;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #eef7ff,
+                    #ffffff
+                );
+
+            box-shadow:
+                0 8px 25px #1769aa25;
+        }
+
+        .final-card::before {
+            background: #1769aa;
+
+            width: 6px;
+        }
+
+        .final-card p {
+            color: #1769aa;
+        }
+
+        .final-card strong {
+            color: #1769aa;
+        }
+
+
+        /* =================================================
+           RISK LEVEL
+        ================================================= */
+
+        #finalRiskLevel {
+            display: inline-block;
+
+            padding: 6px 12px;
+
+            border-radius: 20px;
+
+            font-size: 18px;
+
+            background: #edf2f7;
+        }
+
+        #finalRiskLevel.high {
+            color: #c62828;
+
+            background: #ffebee;
+        }
+
+        #finalRiskLevel.medium {
+            color: #a15c00;
+
+            background: #fff4df;
+        }
+
+        #finalRiskLevel.low {
+            color: #1769aa;
+
+            background: #e8f2fb;
+        }
+
+        #finalRiskLevel.normal {
+            color: #237a3b;
+
+            background: #eaf6ec;
+        }
+
+
+        /* =================================================
+           TABLE WRAPPER
+        ================================================= */
+
+        .table-wrap {
+            overflow-x: auto;
+
+            background: white;
+
+            border-radius: 14px;
+
+            border:
+                1px solid #d9e2ec;
+
+            box-shadow:
+                0 5px 18px #102a4310;
+        }
+
+        table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 1250px;
+        }
+
+        th,
+        td {
+            padding:
+                13px 14px;
+
+            border-bottom:
+                1px solid #e4e8eb;
+
+            text-align: left;
+
+            font-size: 13px;
+        }
+
+        th {
+            position: sticky;
+
+            top: 0;
+
+            z-index: 1;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #25313c,
+                    #34495e
+                );
+
+            font-size: 12px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.4px;
+
+            white-space: nowrap;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        tbody tr:hover {
+            background: #edf5fc;
+        }
+
+        td {
+            color: #334e68;
+        }
+
+
+        /* =================================================
+           RISK COLORS
+        ================================================= */
+
+        .high {
+            color: #bd1e1e !important;
+
+            font-weight: bold;
+        }
+
+        .medium {
+            color: #a15c00 !important;
+
+            font-weight: bold;
+        }
+
+        .low {
+            color: #1769aa !important;
+
+            font-weight: bold;
+        }
+
+        .normal {
+            color: #237a3b !important;
+
+            font-weight: bold;
+        }
+
+        .risk-number {
+            font-weight: bold;
+
+            color: #102a43;
+        }
+
+
+        /* =================================================
+           ML PREDICTION
+        ================================================= */
+
+        .prediction {
+            display: inline-block;
+
+            font-size: 25px;
+
+            font-weight: 800;
+
+            margin: 0 0 18px;
+
+            padding: 8px 14px;
+
+            border-radius: 10px;
+
+            background: #edf2f7;
+        }
+
+        .prediction.high {
+            color: #c62828;
+
+            background: #ffebee;
+        }
+
+        .prediction.normal {
+            color: #237a3b;
+
+            background: #eaf6ec;
+        }
+
+
+        /* =================================================
+           METRICS
+        ================================================= */
+
+        .metrics {
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(180px, 1fr)
+                );
+
+            gap: 12px;
+        }
+
+        .metrics div {
+            padding: 12px 14px;
+
+            border-radius: 10px;
+
+            color: #627d98;
+
+            background: #f6f8fa;
+
+            border:
+                1px solid #e4e8eb;
+
+            font-size: 13px;
+        }
+
+        .metrics span {
+            display: block;
+
+            margin-top: 4px;
+
+            color: #102a43;
+
+            font-size: 17px;
+
+            font-weight: 800;
+        }
+
+
+        /* =================================================
+           ERROR
+        ================================================= */
+
+        .error {
+            display: inline-block;
+
+            padding: 8px 12px;
+
+            border-radius: 8px;
+
+            color: #bd1e1e;
+
+            background: #ffebee;
+
+            font-weight: bold;
+        }
+
+
+        /* =================================================
+           MOBILE
+        ================================================= */
+
+        @media (max-width: 800px) {
+
+            body {
+                padding: 16px;
+            }
+
+            header {
+                align-items: flex-start;
+
+                flex-direction: column;
+            }
+
+            header h1 {
+                font-size: 23px;
+            }
+
+            header button {
+                width: 100%;
+            }
+
+            .session-panel::after {
+                position: static;
+
+                display: inline-block;
+
+                margin-top: 10px;
+            }
+
+            .session-id {
+                display: block;
+
+                max-width: 100%;
+
+                margin:
+                    5px 0 0;
+            }
+
+        }
+
+
+        @media (max-width: 500px) {
+
+            body {
+                padding: 12px;
+            }
+
+            h2 {
+                font-size: 18px;
+            }
+
+            .card strong,
+            .risk-card strong {
+                font-size: 28px;
+            }
+
+            .panel,
+            .session-panel,
+            .card,
+            .risk-card {
+                padding: 16px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+<header>
+
+    <h1>Exam Integrity Dashboard</h1>
+
+    <button
+        id="refreshButton"
+        type="button"
+    >
+        ↻ Refresh Dashboard
+    </button>
+
+</header>
+
+
+<p
+    id="status"
+    class="status"
+    role="status"
+></p>
+
+
+<!-- ================================================= -->
+<!-- EXAM SESSION -->
+<!-- ================================================= -->
+
+<section class="session-panel">
+
+    <h2>
+        Exam Session
+    </h2>
+
+    <p>
+        Session Status:
+        <strong id="sessionStatus">
+            Loading...
+        </strong>
+    </p>
+
+    <p>
+        Session ID:
+        <span
+            id="sessionId"
+            class="session-id"
+        >
+            Not selected
+        </span>
+    </p>
+
+</section>
+
+
+<!-- ================================================= -->
+<!-- BROWSER EVENT SUMMARY -->
+<!-- ================================================= -->
+
+<h2>Browser Event Summary</h2>
+
+<section class="cards">
+
+    <div class="card">
+
+        <p>Total Events</p>
+
+        <strong id="totalEvents">
+            0
+        </strong>
+
+    </div>
+
+
+    <div class="card">
+
+        <p>High Risk Events</p>
+
+        <strong id="highEvents">
+            0
+        </strong>
+
+    </div>
+
+
+    <div class="card">
+
+        <p>Medium Risk Events</p>
+
+        <strong id="mediumEvents">
+            0
+        </strong>
+
+    </div>
+
+
+    <div class="card">
+
+        <p>Low Risk Events</p>
+
+        <strong id="lowEvents">
+            0
+        </strong>
+
+    </div>
+
+
+    <div class="card">
+
+        <p>Normal Events</p>
+
+        <strong id="normalEvents">
+            0
+        </strong>
+
+    </div>
+
+</section>
+
+
+<!-- ================================================= -->
+<!-- STUDENT RISK ANALYSIS -->
+<!-- ================================================= -->
+
+<h2>Student Risk Analysis</h2>
+
+<p class="section-note">
+
+    Multimodal risk calculated using
+    Browser, Camera, Behaviour and ML signals
+    for the selected exam session.
+
+</p>
+
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+    <th>Student ID</th>
+
+    <th>Total Events</th>
+
+    <th>Browser Risk</th>
+
+    <th>Camera Risk</th>
+
+    <th>Behaviour Risk</th>
+
+    <th>ML Prediction</th>
+
+    <th>ML Risk</th>
+
+    <th>Final Risk</th>
+
+    <th>Risk Level</th>
+
+    <th>High Events</th>
+
+    <th>Medium Events</th>
+
+    <th>Low Events</th>
+
+    <th>Latest Event</th>
+
+</tr>
+
+</thead>
+
+
+<tbody id="studentRiskTable">
+
+<tr>
+
+    <td colspan="13">
+        Loading...
+    </td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- CURRENT MULTIMODAL RISK -->
+<!-- ================================================= -->
+
+<h2>Current Multimodal Risk</h2>
+
+<section class="risk-cards">
+
+
+    <div class="risk-card">
+
+        <p>Browser Risk</p>
+
+        <strong id="browserRiskCard">
+            0%
+        </strong>
+
+    </div>
+
+
+    <div class="risk-card">
+
+        <p>Camera Risk</p>
+
+        <strong id="cameraRiskCard">
+            0%
+        </strong>
+
+    </div>
+
+
+    <div class="risk-card behaviour-card">
+
+        <p>Behaviour Risk</p>
+
+        <strong id="behaviourRiskCard">
+            0%
+        </strong>
+
+    </div>
+
+
+    <div class="risk-card ml-card">
+
+        <p>ML Risk</p>
+
+        <strong id="mlRiskCard">
+            0%
+        </strong>
+
+    </div>
+
+
+    <div class="risk-card final-card">
+
+        <p>FINAL MULTIMODAL RISK</p>
+
+        <strong id="finalRiskCard">
+            0%
+        </strong>
+
+    </div>
+
+
+    <div class="risk-card">
+
+        <p>Risk Level</p>
+
+        <strong id="finalRiskLevel">
+            NORMAL
+        </strong>
+
+    </div>
+
+</section>
+
+
+<!-- ================================================= -->
+<!-- ML PREDICTION -->
+<!-- ================================================= -->
+
+<h2>AI / ML Prediction</h2>
+
+<section class="panel">
+
+    <p
+        id="mlPrediction"
+        class="prediction"
+    >
+        Loading...
+    </p>
+
+
+    <div class="metrics">
+
+        <div>
+            Session ID:
+            <span id="mlSessionId">
+                -
+            </span>
+        </div>
+
+
+        <div>
+            Total Events:
+            <span id="mlTotalEvents">
+                0
+            </span>
+        </div>
+
+
+        <div>
+            Tab Hidden:
+            <span id="mlTabHidden">
+                0
+            </span>
+        </div>
+
+
+        <div>
+            Window Blur:
+            <span id="mlWindowBlur">
+                0
+            </span>
+        </div>
+
+
+        <div>
+            Copy:
+            <span id="mlCopy">
+                0
+            </span>
+        </div>
+
+
+        <div>
+            Paste:
+            <span id="mlPaste">
+                0
+            </span>
+        </div>
+
+
+        <div>
+            Cut:
+            <span id="mlCut">
+                0
+            </span>
+        </div>
+
+
+        <div>
+            Fullscreen Exit:
+            <span id="mlFullscreenExit">
+                0
+            </span>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================================================= -->
+<!-- ALL EVENTS -->
+<!-- ================================================= -->
+
+<h2>All Exam Events</h2>
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+
+    <th>ID</th>
+
+    <th>Student ID</th>
+
+    <th>Event Type</th>
+
+    <th>Event Time</th>
+
+    <th>Risk Score</th>
+
+    <th>Risk Level</th>
+
+</tr>
+
+</thead>
+
+
+<tbody id="eventsTable">
+
+<tr>
+
+    <td colspan="6">
+        Loading...
+    </td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+
+<script>
+
+
+// =================================================
+// API ROOT
+// =================================================
+
+const API_ROOT =
+    "http://127.0.0.1:8000";
+
+
+// =================================================
+// GLOBAL DATA
+// =================================================
+
+let allEvents = [];
+
+
+// =================================================
+// GET SESSION ID FROM URL
+// =================================================
+
+const urlParams =
+    new URLSearchParams(
+        window.location.search
+    );
+
+
+const SESSION_ID =
+    urlParams.get(
+        "session_id"
+    );
+
+
+// =================================================
+// DISPLAY SESSION
+// =================================================
+
+function displaySessionInfo() {
+
+    const sessionIdElement =
+        document.getElementById(
+            "sessionId"
+        );
+
+
+    const sessionStatusElement =
+        document.getElementById(
+            "sessionStatus"
+        );
+
+
+    const mlSessionIdElement =
+        document.getElementById(
+            "mlSessionId"
+        );
+
+
+    if (!SESSION_ID) {
+
+        sessionIdElement.textContent =
+            "Not selected";
+
+
+        sessionStatusElement.textContent =
+            "NO SESSION";
+
+
+        mlSessionIdElement.textContent =
+            "No session";
+
+
+        return;
+
+    }
+
+
+    sessionIdElement.textContent =
+        SESSION_ID;
+
+
+    sessionStatusElement.textContent =
+        "SELECTED";
+
+
+    mlSessionIdElement.textContent =
+        SESSION_ID;
+
+}
+
+
+// =================================================
+// HELPER FUNCTIONS
+// =================================================
+
+function formatNumber(value) {
+
+    return Number(
+        value || 0
+    ).toLocaleString();
+
+}
+
+
+function formatRisk(value) {
+
+    return Number(
+        value || 0
+    ).toFixed(0) + "%";
+
+}
+
+
+function addCell(
+    row,
+    value,
+    className
+) {
+
+    const cell =
+        document.createElement(
+            "td"
+        );
+
+
+    cell.textContent =
+        value === null ||
+        value === undefined
+            ? ""
+            : String(value);
+
+
+    if (className) {
+
+        cell.className =
+            className;
+
+    }
+
+
+    row.appendChild(
+        cell
+    );
+
+}
+
+
+// =================================================
+// GET JSON
+// =================================================
+
+async function getJson(path) {
+
+    const response =
+        await fetch(
+            API_ROOT + path
+        );
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            path +
+            " returned " +
+            response.status
+        );
+
+    }
+
+
+    return await response.json();
+
+}
+
+
+// =================================================
+// LOAD SESSION EVENTS
+// =================================================
+
+async function loadEvents() {
+
+    if (!SESSION_ID) {
+
+        allEvents = [];
+
+
+        document.getElementById(
+            "eventsTable"
+        ).innerHTML =
+            '<tr><td colspan="6">No exam session selected.</td></tr>';
+
+
+        document.getElementById(
+            "totalEvents"
+        ).textContent = "0";
+
+
+        document.getElementById(
+            "highEvents"
+        ).textContent = "0";
+
+
+        document.getElementById(
+            "mediumEvents"
+        ).textContent = "0";
+
+
+        document.getElementById(
+            "lowEvents"
+        ).textContent = "0";
+
+
+        document.getElementById(
+            "normalEvents"
+        ).textContent = "0";
+
+
+        return;
+
+    }
+
+
+    const data =
+        await getJson(
+            "/api/browser-events?session_id=" +
+            encodeURIComponent(
+                SESSION_ID
+            )
+        );
+
+
+    allEvents =
+        Array.isArray(
+            data.events
+        )
+            ? data.events
+            : [];
+
+
+    console.log(
+        "Session events:",
+        allEvents
+    );
+
+
+    const counts = {
+
+        high: 0,
+        medium: 0,
+        low: 0,
+        normal: 0
+
+    };
+
+
+    const table =
+        document.getElementById(
+            "eventsTable"
+        );
+
+
+    table.replaceChildren();
+
+
+    allEvents.forEach(
+        event => {
+
+            const level =
+                String(
+                    event.risk_level ||
+                    "normal"
+                ).toLowerCase();
+
+
+            counts[level] =
+                (
+                    counts[level] ||
+                    0
+                ) + 1;
+
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            addCell(
+                row,
+                event.id
+            );
+
+
+            addCell(
+                row,
+                event.student_id
+            );
+
+
+            addCell(
+                row,
+                event.event_type
+            );
+
+
+            addCell(
+                row,
+                event.event_time
+            );
+
+
+            addCell(
+                row,
+                event.risk_score
+            );
+
+
+            addCell(
+                row,
+                level.toUpperCase(),
+                level
+            );
+
+
+            table.appendChild(
+                row
+            );
+
+        }
+    );
+
+
+    if (!allEvents.length) {
+
+        table.innerHTML =
+            '<tr><td colspan="6">No events recorded for this session.</td></tr>';
+
+    }
+
+
+    document.getElementById(
+        "totalEvents"
+    ).textContent =
+        formatNumber(
+            allEvents.length
+        );
+
+
+    document.getElementById(
+        "highEvents"
+    ).textContent =
+        formatNumber(
+            counts.high
+        );
+
+
+    document.getElementById(
+        "mediumEvents"
+    ).textContent =
+        formatNumber(
+            counts.medium
+        );
+
+
+    document.getElementById(
+        "lowEvents"
+    ).textContent =
+        formatNumber(
+            counts.low
+        );
+
+
+    document.getElementById(
+        "normalEvents"
+    ).textContent =
+        formatNumber(
+            counts.normal
+        );
+
+}
+
+
+// =================================================
+// LOAD SESSION STUDENT RISK
+// =================================================
+
+async function loadStudentRisk() {
+
+    if (!SESSION_ID) {
+
+        document.getElementById(
+            "studentRiskTable"
+        ).innerHTML =
+            '<tr><td colspan="13">No exam session selected.</td></tr>';
+
+
+        updateRiskCards(
+            0,
+            0,
+            0,
+            "NORMAL",
+            0,
+            0
+        );
+
+
+        return;
+
+    }
+
+
+    const data =
+        await getJson(
+            "/api/student-risk?session_id=" +
+            encodeURIComponent(
+                SESSION_ID
+            )
+        );
+
+
+    const students =
+        Array.isArray(
+            data.students
+        )
+            ? data.students
+            : [];
+
+
+    const table =
+        document.getElementById(
+            "studentRiskTable"
+        );
+
+
+    table.replaceChildren();
+
+
+    if (!students.length) {
+
+        table.innerHTML =
+            '<tr><td colspan="13">No student data for this session.</td></tr>';
+
+
+        updateRiskCards(
+            0,
+            0,
+            0,
+            "NORMAL",
+            0,
+            0
+        );
+
+
+        return;
+
+    }
+
+
+    students.forEach(
+        student => {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            addCell(
+                row,
+                student.student_id
+            );
+
+
+            addCell(
+                row,
+                formatNumber(
+                    student.total_events
+                )
+            );
+
+
+            addCell(
+                row,
+                formatRisk(
+                    student.browser_risk
+                ),
+                "risk-number"
+            );
+
+
+            addCell(
+                row,
+                formatRisk(
+                    student.camera_risk
+                ),
+                "risk-number"
+            );
+
+
+            addCell(
+                row,
+                formatRisk(
+                    student.behaviour_risk
+                ),
+                "risk-number"
+            );
+
+
+            const prediction =
+                student.ml_prediction ||
+                "NORMAL";
+
+
+            const predictionCell =
+                document.createElement(
+                    "td"
+                );
+
+
+            predictionCell.textContent =
+                prediction;
+
+
+            if (
+                prediction
+                    .toUpperCase()
+                    .includes(
+                        "CHEATING"
+                    ) ||
+                prediction
+                    .toUpperCase()
+                    .includes(
+                        "SUSPICIOUS"
+                    )
+            ) {
+
+                predictionCell.className =
+                    "high";
+
+            }
+
+
+            row.appendChild(
+                predictionCell
+            );
+
+
+            addCell(
+                row,
+                formatRisk(
+                    student.ml_risk
+                ),
+                "risk-number"
+            );
+
+
+            addCell(
+                row,
+                formatRisk(
+                    student.risk_score
+                ),
+                "risk-number"
+            );
+
+
+            const level =
+                String(
+                    student.risk_level ||
+                    "normal"
+                ).toLowerCase();
+
+
+            addCell(
+                row,
+                level.toUpperCase(),
+                level
+            );
+
+
+            addCell(
+                row,
+                formatNumber(
+                    student.high_risk_events
+                )
+            );
+
+
+            addCell(
+                row,
+                formatNumber(
+                    student.medium_risk_events
+                )
+            );
+
+
+            addCell(
+                row,
+                formatNumber(
+                    student.low_risk_events
+                )
+            );
+
+
+            addCell(
+                row,
+                student.latest_event ||
+                "-"
+            );
+
+
+            table.appendChild(
+                row
+            );
+
+        }
+    );
+
+
+    const firstStudent =
+        students[0];
+
+
+    updateRiskCards(
+
+        firstStudent.browser_risk,
+
+        firstStudent.camera_risk,
+
+        firstStudent.risk_score,
+
+        firstStudent.risk_level,
+
+        firstStudent.behaviour_risk,
+
+        firstStudent.ml_risk
+
+    );
+
+
+    if (
+        firstStudent.ml_prediction
+    ) {
+
+        document.getElementById(
+            "mlPrediction"
+        ).textContent =
+            firstStudent.ml_prediction;
+
+    }
+
+
+    console.log(
+        "Session multimodal risk:",
+        students
+    );
+
+}
+
+
+// =================================================
+// UPDATE RISK CARDS
+// =================================================
+
+function updateRiskCards(
+    browser,
+    camera,
+    finalRisk,
+    level,
+    behaviour,
+    mlRisk
+) {
+
+    document.getElementById(
+        "browserRiskCard"
+    ).textContent =
+        formatRisk(
+            browser
+        );
+
+
+    document.getElementById(
+        "cameraRiskCard"
+    ).textContent =
+        formatRisk(
+            camera
+        );
+
+
+    document.getElementById(
+        "behaviourRiskCard"
+    ).textContent =
+        formatRisk(
+            behaviour
+        );
+
+
+    document.getElementById(
+        "mlRiskCard"
+    ).textContent =
+        formatRisk(
+            mlRisk
+        );
+
+
+    document.getElementById(
+        "finalRiskCard"
+    ).textContent =
+        formatRisk(
+            finalRisk
+        );
+
+
+    const riskLevel =
+        String(
+            level || "normal"
+        ).toLowerCase();
+
+
+    const levelElement =
+        document.getElementById(
+            "finalRiskLevel"
+        );
+
+
+    levelElement.textContent =
+        riskLevel.toUpperCase();
+
+
+    levelElement.className =
+        riskLevel;
+
+}
+
+
+// =================================================
+// LOAD SESSION-SPECIFIC ML PREDICTION
+// =================================================
+
+async function loadMLPrediction() {
+
+    const predictionElement =
+        document.getElementById(
+            "mlPrediction"
+        );
+
+
+    if (!SESSION_ID) {
+
+        predictionElement.textContent =
+            "NO SESSION";
+
+        document.getElementById(
+            "mlSessionId"
+        ).textContent =
+            "No session";
+
+
+        document.getElementById(
+            "mlTotalEvents"
+        ).textContent = "0";
+
+
+        document.getElementById(
+            "mlTabHidden"
+        ).textContent = "0";
+
+
+        document.getElementById(
+            "mlWindowBlur"
+        ).textContent = "0";
+
+
+        document.getElementById(
+            "mlCopy"
+        ).textContent = "0";
+
+
+        document.getElementById(
+            "mlPaste"
+        ).textContent = "0";
+
+
+        document.getElementById(
+            "mlCut"
+        ).textContent = "0";
+
+
+        document.getElementById(
+            "mlFullscreenExit"
+        ).textContent = "0";
+
+
+        return;
+
+    }
+
+
+    try {
+
+        const data =
+            await getJson(
+                "/api/ml-prediction?session_id=" +
+                encodeURIComponent(
+                    SESSION_ID
+                )
+            );
+
+
+        console.log(
+            "Session ML prediction:",
+            data
+        );
+
+
+        predictionElement.textContent =
+            data.prediction ||
+            "No prediction";
+
+
+        document.getElementById(
+            "mlSessionId"
+        ).textContent =
+            data.session_id ||
+            SESSION_ID;
+
+
+        document.getElementById(
+            "mlTotalEvents"
+        ).textContent =
+            formatNumber(
+                data.total_events
+            );
+
+
+        document.getElementById(
+            "mlTabHidden"
+        ).textContent =
+            formatNumber(
+                data.tab_hidden
+            );
+
+
+        document.getElementById(
+            "mlWindowBlur"
+        ).textContent =
+            formatNumber(
+                data.window_blur
+            );
+
+
+        document.getElementById(
+            "mlCopy"
+        ).textContent =
+            formatNumber(
+                data.copy
+            );
+
+
+        document.getElementById(
+            "mlPaste"
+        ).textContent =
+            formatNumber(
+                data.paste
+            );
+
+
+        document.getElementById(
+            "mlCut"
+        ).textContent =
+            formatNumber(
+                data.cut
+            );
+
+
+        document.getElementById(
+            "mlFullscreenExit"
+        ).textContent =
+            formatNumber(
+                data.fullscreen_exit
+            );
+
+
+        if (
+            String(
+                data.prediction || ""
+            )
+                .toUpperCase()
+                .includes(
+                    "CHEATING"
+                ) ||
+            String(
+                data.prediction || ""
+            )
+                .toUpperCase()
+                .includes(
+                    "SUSPICIOUS"
+                )
+        ) {
+
+            predictionElement.className =
+                "prediction high";
+
+        }
+
+        else {
+
+            predictionElement.className =
+                "prediction normal";
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Session ML prediction error:",
+            error
+        );
+
+
+        predictionElement.textContent =
+            "ML prediction unavailable.";
+
+
+        document.getElementById(
+            "mlSessionId"
+        ).textContent =
+            SESSION_ID;
+
+    }
+
+}
+
+
+// =================================================
+// LOAD DASHBOARD
+// =================================================
+
+async function loadDashboard() {
+
+    const button =
+        document.getElementById(
+            "refreshButton"
+        );
+
+
+    const status =
+        document.getElementById(
+            "status"
+        );
+
+
+    button.disabled = true;
+
+
+    status.textContent =
+        "Loading dashboard...";
+
+
+    try {
+
+        displaySessionInfo();
+
+
+        await loadEvents();
+
+
+        await loadStudentRisk();
+
+
+        await loadMLPrediction();
+
+
+        status.textContent =
+            "Dashboard updated successfully.";
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Dashboard error:",
+            error
+        );
+
+
+        status.innerHTML =
+            '<span class="error">' +
+            "Backend connection failed. Check FastAPI server." +
+            "</span>";
+
+    }
+
+    finally {
+
+        button.disabled = false;
+
+    }
+
+}
+
+
+// =================================================
+// REFRESH BUTTON
+// =================================================
+
+document
+    .getElementById(
+        "refreshButton"
+    )
+    .addEventListener(
+        "click",
+        loadDashboard
+    );
+
+
+// =================================================
+// START DASHBOARD
+// =================================================
+
+loadDashboard();
+
+
+</script>
+
+</body>
+</html>

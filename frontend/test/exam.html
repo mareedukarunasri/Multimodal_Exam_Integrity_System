@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Multimodal AI Exam Monitoring</title>
+
+<style>
+
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f8;
+        text-align: center;
+        padding: 20px;
+    }
+
+    h1 {
+        margin-bottom: 15px;
+    }
+
+    button {
+        padding: 12px 25px;
+        margin: 10px;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        border-radius: 6px;
+    }
+
+    #startBtn {
+        background: green;
+        color: white;
+    }
+
+    #stopBtn {
+        background: red;
+        color: white;
+    }
+
+    button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    video {
+        width: 640px;
+        max-width: 95%;
+        background: black;
+        border: 3px solid #333;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+
+    .panel {
+        background: white;
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .item {
+        font-size: 18px;
+        margin: 12px;
+    }
+
+    #riskScore {
+        font-size: 40px;
+        font-weight: bold;
+    }
+
+    #riskLevel {
+        font-size: 25px;
+        font-weight: bold;
+    }
+
+    #mlPrediction {
+        font-size: 24px;
+        font-weight: bold;
+    }
+
+    #sessionId {
+        font-size: 14px;
+        word-break: break-all;
+        color: #555;
+    }
+
+    #mlSessionId {
+        font-size: 14px;
+        word-break: break-all;
+        color: #555;
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<h1>
+    Multimodal AI-Based Exam Cheating Behaviour Analysis System
+</h1>
+
+<h2 id="examStatus">
+    EXAM NOT STARTED
+</h2>
+
+<button
+ type="button"
+ id="startBtn"
+ onclick="window.startExamNow()">
+
+START EXAM
+
+</button>
+
+<button
+ type="button"
+ id="stopBtn"
+ onclick="window.stopExamNow()">
+
+STOP EXAM
+
+</button>
+
+<p id="message">
+    Click START EXAM to begin monitoring.
+</p>
+
+<!-- ===================================================== -->
+
+<!-- EXAM SESSION -->
+
+<!-- ===================================================== -->
+
+<div class="panel">
+
+<h2>Exam Session</h2>
+
+<div class="item">
+
+    Session Status:
+
+    <b id="sessionStatus">
+        Not Started
+    </b>
+
+</div>
+
+<div class="item">
+
+    Session ID:
+
+    <div id="sessionId">
+        -
+    </div>
+
+</div>
+
+ </div>
+
+<!-- ===================================================== -->
+
+<!-- CAMERA MONITORING -->
+
+<!-- ===================================================== -->
+
+<div class="panel">
+
+<h2>Camera Monitoring</h2>
+
+<video
+    id="camera"
+    autoplay
+    muted
+    playsinline>
+</video>
+
+<div class="item">
+
+    Camera:
+
+    <span id="cameraStatus">
+        Not Running
+    </span>
+
+</div>
+
+<div class="item">
+
+    Faces:
+
+    <span id="faceCount">
+        0
+    </span>
+
+</div>
+
+<div class="item">
+
+    Head Movement:
+
+    <span id="headMovement">
+        Not Active
+    </span>
+
+</div>
+
+<div class="item">
+
+    Mobile Phone:
+
+    <span id="phoneStatus">
+        Not Detected
+    </span>
+
+</div>
+
+<div class="item">
+
+    Speech:
+
+    <span id="speechStatus">
+        Not Active
+    </span>
+
+</div>
+
+</div>
+
+<!-- ===================================================== -->
+
+<!-- SYSTEM STATUS -->
+
+<!-- ===================================================== -->
+
+<div class="panel">
+
+<h2>System Status</h2>
+
+<div class="item">
+
+    Student ID:
+
+    <b>S001</b>
+
+</div>
+
+<div class="item">
+
+    Backend:
+
+    <span id="backendStatus">
+        Checking...
+    </span>
+
+</div>
+
+<div class="item">
+
+    AI Monitoring:
+
+    <span id="aiStatus">
+        Not Started
+    </span>
+
+</div>
+
+</div>
+
+<!-- ===================================================== -->
+
+<!-- FINAL RISK -->
+
+<!-- ===================================================== -->
+
+<div class="panel">
+
+<h2>
+    CURRENT EXAM RISK SCORE
+</h2>
+
+<div id="riskScore">
+    0%
+</div>
+
+<div id="riskLevel">
+    NORMAL
+</div>
+
+</div>
+
+<!-- ===================================================== -->
+
+<!-- ML BEHAVIOUR PREDICTION -->
+
+<!-- ===================================================== -->
+
+<div class="panel">
+
+<h2>
+    ML BEHAVIOUR PREDICTION
+</h2>
+
+<div class="item">
+
+    Prediction:
+
+    <b id="mlPrediction">
+        Checking...
+    </b>
+
+</div>
+
+<div class="item">
+
+    ML Session ID:
+
+    <div id="mlSessionId">
+        -
+    </div>
+
+</div>
+
+<div class="item">
+
+    Total Events:
+
+    <span id="mlTotalEvents">
+        0
+    </span>
+
+</div>
+
+<div class="item">
+
+    Tab Hidden:
+
+    <span id="mlTabHidden">
+        0
+    </span>
+
+</div>
+
+<div class="item">
+
+    Window Blur:
+
+    <span id="mlWindowBlur">
+        0
+    </span>
+
+</div>
+
+<div class="item">
+
+    Copy:
+
+    <span id="mlCopy">
+        0
+    </span>
+
+</div>
+
+<div class="item">
+
+    Paste:
+
+    <span id="mlPaste">
+        0
+    </span>
+
+</div>
+
+<div class="item">
+
+    Cut:
+
+    <span id="mlCut">
+        0
+    </span>
+
+</div>
+
+<div class="item">
+
+    Fullscreen Exit:
+
+    <span id="mlFullscreenExit">
+        0
+    </span>
+
+</div>
+
+</div>
+
+<!-- ===================================================== -->
+
+<!-- LIBRARIES -->
+
+<!-- ===================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+
+<!-- ===================================================== -->
+
+<!-- CAMERA MONITORING -->
+
+<!-- ===================================================== -->
+
+<script src="../src/monitoring/camera_monitor.js"></script>
+
+<!-- ===================================================== -->
+
+<!-- BROWSER MONITORING -->
+
+<!-- IMPORTANT: ABSOLUTE FRONTEND PATH -->
+
+<!-- ===================================================== -->
+
+<script src="/frontend/src/monitoring/browserMonitor.js"></script>
+
+<!-- ===================================================== -->
+
+<!-- EXAM CONTROL -->
+
+<!-- ===================================================== -->
+
+<script>
+
+console.log("================================");
+console.log("EXAM CONTROL SCRIPT LOADED");
+console.log("================================");
+
+(function () {
+
+    const BACKEND_URL =
+        "http://127.0.0.1:8000";
+
+    const STUDENT_ID =
+        "S001";
+
+
+    let currentSessionId = null;
+
+    let riskTimer = null;
+
+    let mlTimer = null;
+
+    let examRunning = false;
+
+    window.currentExamSessionId = null;
+
+
+    // ====================================================
+    // START EXAM
+    // ====================================================
+
+    window.startExamNow = async function () {
+
+        console.log("START EXAM CLICKED");
+
+        const examStatus =
+            document.getElementById("examStatus");
+
+        const message =
+            document.getElementById("message");
+
+        const cameraStatus =
+            document.getElementById("cameraStatus");
+
+        const aiStatus =
+            document.getElementById("aiStatus");
+
+        const video =
+            document.getElementById("camera");
+
+        const startBtn =
+            document.getElementById("startBtn");
+
+        const stopBtn =
+            document.getElementById("stopBtn");
+
+        const sessionStatus =
+            document.getElementById("sessionStatus");
+
+        const sessionIdElement =
+            document.getElementById("sessionId");
+
+        const mlSessionIdElement =
+            document.getElementById("mlSessionId");
+
+
+        if (examRunning) {
+
+            console.log("Exam already running.");
+
+            return;
+
+        }
+
+
+        examRunning = true;
+
+        startBtn.disabled = true;
+
+        stopBtn.disabled = false;
+
+
+        examStatus.innerText =
+            "STARTING EXAM...";
+
+        message.innerText =
+            "Creating exam session...";
+
+        cameraStatus.innerText =
+            "Waiting...";
+
+        aiStatus.innerText =
+            "Starting...";
+
+        sessionStatus.innerText =
+            "Creating...";
+
+
+        // =================================================
+        // CREATE EXAM SESSION
+        // =================================================
+
+        try {
+
+            console.log(
+                "Creating new exam session..."
+            );
+
+
+            const response = await fetch(
+
+                `${BACKEND_URL}/api/exam/start`,
+
+                {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body: JSON.stringify({
+
+                        student_id:
+                            STUDENT_ID
+
+                    })
+
+                }
+
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    `Exam session start failed: HTTP ${response.status}`
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            console.log(
+                "Exam session response:",
+                data
+            );
+
+
+            if (
+                !data.session ||
+                !data.session.session_id
+            ) {
+
+                throw new Error(
+                    "Backend did not return a valid session ID."
+                );
+
+            }
+
+
+            // =================================================
+            // SAVE SESSION ID
+            // =================================================
+
+            currentSessionId =
+                data.session.session_id;
+
+
+            window.currentExamSessionId =
+                currentSessionId;
+
+
+            sessionStorage.setItem(
+                "currentExamSessionId",
+                currentSessionId
+            );
+
+
+            console.log(
+                "CURRENT SESSION ID:",
+                currentSessionId
+            );
+
+
+            sessionIdElement.innerText =
+                currentSessionId;
+
+            mlSessionIdElement.innerText =
+                currentSessionId;
+
+            sessionStatus.innerText =
+                "ACTIVE";
+
+
+            // =================================================
+            // START CAMERA
+            // =================================================
+
+            message.innerText =
+                "Starting camera...";
+
+            cameraStatus.innerText =
+                "Starting...";
+
+
+            console.log(
+                "Requesting camera..."
+            );
+
+
+            if (
+                typeof startCamera !==
+                "function"
+            ) {
+
+                throw new Error(
+                    "Camera monitoring module is not loaded."
+                );
+
+            }
+
+
+            const started =
+                await startCamera(video);
+
+
+            if (!started) {
+
+                throw new Error(
+                    "Camera could not be started."
+                );
+
+            }
+
+
+            // =================================================
+            // EXAM SUCCESSFULLY STARTED
+            // =================================================
+
+            examStatus.innerText =
+                "EXAM RUNNING";
+
+            message.innerText =
+                "AI monitoring is active.";
+
+            cameraStatus.innerText =
+                "Running";
+
+            aiStatus.innerText =
+                "Active";
+
+            sessionStatus.innerText =
+                "ACTIVE";
+
+
+            startRiskPolling();
+
+
+            console.log(
+                "Exam started successfully."
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Exam start failed:",
+                error
+            );
+
+
+            examRunning = false;
+
+            currentSessionId =
+                null;
+
+            window.currentExamSessionId =
+                null;
+
+
+            sessionStorage.removeItem(
+                "currentExamSessionId"
+            );
+
+
+            startBtn.disabled =
+                false;
+
+            stopBtn.disabled =
+                true;
+
+
+            examStatus.innerText =
+                "EXAM START FAILED";
+
+            message.innerText =
+                error.message;
+
+            cameraStatus.innerText =
+                "Not Running";
+
+            aiStatus.innerText =
+                "Failed";
+
+            sessionStatus.innerText =
+                "Failed";
+
+            sessionIdElement.innerText =
+                "-";
+
+            mlSessionIdElement.innerText =
+                "-";
+
+        }
+
+    };
+
+
+    // ====================================================
+    // STOP EXAM
+    // ====================================================
+
+    window.stopExamNow = async function () {
+
+        console.log(
+            "STOP EXAM CLICKED"
+        );
+
+
+        const completedSessionId =
+            currentSessionId;
+
+
+        console.log(
+            "COMPLETED SESSION ID:",
+            completedSessionId
+        );
+
+
+        if (
+            typeof stopCamera ===
+            "function"
+        ) {
+
+            stopCamera();
+
+        }
+
+
+        if (riskTimer) {
+
+            clearInterval(
+                riskTimer
+            );
+
+        }
+
+
+        if (mlTimer) {
+
+            clearInterval(
+                mlTimer
+            );
+
+        }
+
+
+        riskTimer = null;
+
+        mlTimer = null;
+
+
+        // =================================================
+        // END BACKEND SESSION
+        // =================================================
+
+        if (completedSessionId) {
+
+            try {
+
+                console.log(
+                    "Ending exam session:",
+                    completedSessionId
+                );
+
+
+                const response =
+                    await fetch(
+
+                        `${BACKEND_URL}/api/exam/end`,
+
+                        {
+
+                            method: "POST",
+
+                            headers: {
+
+                                "Content-Type":
+                                    "application/json"
+
+                            },
+
+                            body: JSON.stringify({
+
+                                session_id:
+                                    completedSessionId
+
+                            })
+
+                        }
+
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "Exam end response:",
+                    data
+                );
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Failed to end exam session:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        // =================================================
+        // UPDATE UI
+        // =================================================
+
+        examRunning = false;
+
+
+        document.getElementById(
+            "examStatus"
+        ).innerText =
+            "EXAM COMPLETED";
+
+
+        document.getElementById(
+            "message"
+        ).innerText =
+            "Exam completed. Opening dashboard...";
+
+
+        document.getElementById(
+            "cameraStatus"
+        ).innerText =
+            "Not Running";
+
+
+        document.getElementById(
+            "aiStatus"
+        ).innerText =
+            "Not Started";
+
+
+        document.getElementById(
+            "sessionStatus"
+        ).innerText =
+            "COMPLETED";
+
+
+        document.getElementById(
+            "startBtn"
+        ).disabled =
+            false;
+
+
+        document.getElementById(
+            "stopBtn"
+        ).disabled =
+            true;
+
+
+        // =================================================
+        // OPEN DASHBOARD
+        // =================================================
+
+        if (completedSessionId) {
+
+            console.log(
+                "Opening dashboard for session:",
+                completedSessionId
+            );
+
+
+            const dashboardUrl =
+                `dashboard.html?session_id=${encodeURIComponent(completedSessionId)}`;
+
+
+            console.log(
+                "Dashboard URL:",
+                dashboardUrl
+            );
+
+
+            setTimeout(function () {
+
+                window.location.href =
+                    dashboardUrl;
+
+            }, 800);
+
+
+            return;
+
+        }
+
+
+        console.log(
+            "No completed session ID available."
+        );
+
+
+        currentSessionId =
+            null;
+
+        window.currentExamSessionId =
+            null;
+
+
+        sessionStorage.removeItem(
+            "currentExamSessionId"
+        );
+
+
+        console.log(
+            "Exam stopped."
+        );
+
+    };
+
+
+    // ====================================================
+    // UPDATE CURRENT SESSION RISK
+    // ====================================================
+
+    async function updateRisk() {
+
+        if (!currentSessionId) {
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+
+                    `${BACKEND_URL}/api/student-risk?session_id=${encodeURIComponent(currentSessionId)}`
+
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    `HTTP ${response.status}`
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            const student =
+                (data.students || [])
+                    .find(
+
+                        item =>
+                            item.student_id ===
+                            STUDENT_ID
+
+                    );
+
+
+            if (student) {
+
+                document.getElementById(
+                    "riskScore"
+                ).textContent =
+                    `${student.risk_score || 0}%`;
+
+
+                document.getElementById(
+                    "riskLevel"
+                ).textContent =
+                    String(
+                        student.risk_level ||
+                        "normal"
+                    ).toUpperCase();
+
+            }
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Risk update failed:",
+                error
+            );
+
+        }
+
+    };
+
+
+    // ====================================================
+    // UPDATE ML PREDICTION
+    // ====================================================
+
+    async function updatePrediction() {
+
+        if (!currentSessionId) {
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+
+                    `${BACKEND_URL}/api/ml-prediction?session_id=${encodeURIComponent(currentSessionId)}`
+
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    `HTTP ${response.status}`
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            console.log(
+                "ML prediction for current session:",
+                data
+            );
+
+
+            document.getElementById(
+                "mlPrediction"
+            ).textContent =
+                data.prediction ||
+                "Unavailable";
+
+
+            document.getElementById(
+                "mlSessionId"
+            ).textContent =
+                data.session_id ||
+                currentSessionId;
+
+
+            const fields = [
+
+                "total_events",
+
+                "tab_hidden",
+
+                "window_blur",
+
+                "copy",
+
+                "paste",
+
+                "cut",
+
+                "fullscreen_exit"
+
+            ];
+
+
+            fields.forEach(
+                field => {
+
+                    const id =
+                        "ml" +
+                        field
+                            .split("_")
+                            .map(
+                                part =>
+                                    part[0]
+                                        .toUpperCase() +
+                                    part.slice(1)
+                            )
+                            .join("");
+
+
+                    const element =
+                        document.getElementById(
+                            id
+                        );
+
+
+                    if (element) {
+
+                        element.textContent =
+                            data[field] || 0;
+
+                    }
+
+                }
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Prediction update failed:",
+                error
+            );
+
+        }
+
+    };
+
+
+    // ====================================================
+    // START RISK POLLING
+    // ====================================================
+
+    function startRiskPolling() {
+
+        if (riskTimer) {
+
+            clearInterval(
+                riskTimer
+            );
+
+        }
+
+
+        if (mlTimer) {
+
+            clearInterval(
+                mlTimer
+            );
+
+        }
+
+
+        updateRisk();
+
+        updatePrediction();
+
+
+        riskTimer =
+            setInterval(
+
+                updateRisk,
+
+                3000
+
+            );
+
+
+        mlTimer =
+            setInterval(
+
+                updatePrediction,
+
+                5000
+
+            );
+
+    }
+
+
+    // ====================================================
+    // INITIAL BUTTON STATE
+    // ====================================================
+
+    document.getElementById(
+        "startBtn"
+    ).disabled = false;
+
+
+    document.getElementById(
+        "stopBtn"
+    ).disabled = true;
+
+
+})();
+
+</script>
+
+</body>
+
+</html>

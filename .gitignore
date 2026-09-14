@@ -1,0 +1,24 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python test/cache
+.pytest_cache/
+.mypy_cache/
+
+# Local runtime database
+backend/exam_events.db
+
+# Environment/secrets
+.env
+.env.*
+!.env.example
+
+# OS generated files
+Thumbs.db
+.DS_Store
