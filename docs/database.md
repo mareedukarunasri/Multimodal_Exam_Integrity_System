@@ -1,65 +1,61 @@
 # Database Documentation
 
-## Multimodal AI-Based Exam Cheating Behaviour Analysis System
+## 1. Overview
 
-The project uses **SQLite** as the local database for storing examination sessions and monitoring events.
+The Multimodal AI-Based Exam Cheating Behaviour Analysis System uses **SQLite** to store examination sessions and detected monitoring events.
 
----
-
-## 1. Database Technology
-
-The database technology used is:
-
-```text
-SQLite
-```
-
-The database file is created automatically by the backend:
-
-```text
-backend/exam_events.db
-```
-
-The database is intentionally excluded from GitHub because it contains local runtime examination data.
+The database is lightweight, local, and suitable for the academic prototype.
 
 ---
 
-## 2. Database Architecture
+## 2. Database Technology
 
-The database stores information generated during examination sessions.
+* Database: SQLite
+* Database File: `backend/exam_events.db`
+* Database Access: Python `sqlite3`
+* Storage Type: Local relational database
 
-```text
-Browser Monitoring
-       |
-Camera Monitoring
-       |
-Microphone / Behaviour Monitoring
-       |
-       v
-FastAPI Backend
-       |
-       v
-SQLite Database
-       |
-       +-------------------+
-       |                   |
-       v                   v
-browser_events       exam_sessions
-       |                   |
-       +---------+---------+
-                 |
-                 v
-           Risk Analysis
-                 |
-                 v
-             Dashboard
-```
+The database file is generated automatically when the backend starts and is excluded from GitHub because it contains runtime data.
 
 ---
 
-## 3. Browser Events Table
+## 3. Database Tables
 
-The `browser_events` table stores browser monitoring events generated during an examination.
+The system mainly uses two tables:
+
+1. `exam_sessions`
+2. `browser_events`
+
+---
+
+## 4. Exam Sessions Table
+
+The `exam_sessions` table stores information about individual examination sessions.
+
+### Main Fields
+
+| Field        | Description                            |
+| ------------ | -------------------------------------- |
+| `session_id` | Unique identifier for the exam session |
+| `student_id` | Unique student identifier              |
+| `start_time` | Examination start time                 |
+| `end_time`   | Examination end time                   |
+| `status`     | Current session status                 |
+
+### Purpose
+
+This table allows the system to:
+
+* Start a new examination session
+* Track the active session
+* Identify completed sessions
+* Associate monitoring events with a particular examination
+
+---
+
+## 5. Browser Events Table
+
+The `browser_events` table stores events detected from the student's browser.
 
 ### Main Fields
 
@@ -68,87 +64,28 @@ The `browser_events` table stores browser monitoring events generated during an 
 | `id`         | Unique event ID                  |
 | `student_id` | Student identifier               |
 | `event_type` | Type of browser event            |
-| `event_time` | Time when event occurred         |
+| `event_time` | Time when the event occurred     |
 | `risk_score` | Risk score assigned to the event |
 | `risk_level` | LOW, MEDIUM, or HIGH             |
-| `session_id` | Examination session identifier   |
+| `session_id` | Associated examination session   |
 
 ### Example Events
 
-```text
-copy
-paste
-cut
-right_click
-tab_hidden
-tab_visible
-window_blur
-window_focus
-fullscreen_exit
-```
+* `copy`
+* `paste`
+* `cut`
+* `right_click`
+* `tab_hidden`
+* `tab_visible`
+* `window_blur`
+* `window_focus`
+* `fullscreen_exit`
 
 ---
 
-## 4. Examination Sessions Table
+## 6. Risk Score Storage
 
-The `exam_sessions` table stores information about each examination attempt.
-
-### Main Fields
-
-| Field        | Description                   |
-| ------------ | ----------------------------- |
-| `session_id` | Unique examination session ID |
-| `student_id` | Student identifier            |
-| `started_at` | Examination start time        |
-| `ended_at`   | Examination end time          |
-| `status`     | Current session status        |
-
-### Session Status
-
-A session can be tracked using statuses such as:
-
-```text
-active
-completed
-```
-
----
-
-## 5. Session-Based Event Storage
-
-Each monitoring event is associated with an examination session using `session_id`.
-
-```text
-Student
-   |
-   v
-Start Examination
-   |
-   v
-Generate Session ID
-   |
-   v
-Monitoring Events
-   |
-   +---- Browser Events
-   |
-   +---- Camera Events
-   |
-   +---- Behaviour Events
-   |
-   v
-Store with Session ID
-```
-
-This prevents events from different examination attempts from being mixed together.
-
----
-
-## 6. Event Risk Information
-
-Each detected event can contain risk information.
-
-### Risk Score Ranges
+Each detected event can be assigned a risk score.
 
 | Risk Score  | Risk Level |
 | ----------- | ---------- |
@@ -156,203 +93,150 @@ Each detected event can contain risk information.
 | 0.40 – 0.69 | MEDIUM     |
 | 0.70 – 1.00 | HIGH       |
 
-### Examples
-
-```text
-copy
-0.3
-LOW
-```
-
-```text
-tab_hidden
-0.7
-HIGH
-```
-
-```text
-mobile_phone_detected
-0.9
-HIGH
-```
+These values are used by the risk analysis module to calculate the student's overall behaviour risk.
 
 ---
 
-## 7. Example Browser Event Record
+## 7. Session-Based Data
 
-A typical event stored in the database can contain:
+Each browser event is associated with a `session_id`.
+
+This prevents events from different examinations from being mixed together.
+
+For example:
 
 ```text
-ID: 95
-Student ID: S001
-Event Type: tab_hidden
-Event Time: 2026-09-14T10:20:00Z
-Risk Score: 0.7
-Risk Level: HIGH
-Session ID: <exam-session-id>
+Session A
+   ├── tab_hidden
+   ├── copy
+   └── window_blur
+
+Session B
+   ├── paste
+   ├── fullscreen_exit
+   └── tab_hidden
 ```
+
+The dashboard can therefore display data for a specific examination session.
 
 ---
 
-## 8. Database Flow
+## 8. Database Operations
 
-The complete database flow is:
-
-```text
-Monitoring Module
-       |
-       v
-Event Generated
-       |
-       v
-FastAPI API
-       |
-       v
-Risk Score Calculation
-       |
-       v
-SQLite Database
-       |
-       v
-Retrieve Session Data
-       |
-       v
-Risk Analysis
-       |
-       v
-Dashboard
-```
-
----
-
-## 9. Database Operations
-
-The backend performs operations such as:
+The backend performs the following database operations:
 
 ### Create Database
 
 Creates the SQLite database and required tables.
 
-### Store Event
+### Insert Event
 
-Stores a monitoring event with its student ID, event type, timestamp, risk information, and session ID.
+Stores a newly detected monitoring event.
 
-### Create Session
+### Retrieve Events
+
+Retrieves browser events for a student or examination session.
+
+### Start Session
 
 Creates a new examination session.
 
 ### End Session
 
-Updates the examination session when the examination is completed.
+Marks an examination session as completed.
 
-### Retrieve Events
+### Retrieve Session
 
-Retrieves events belonging to a particular examination session.
+Retrieves information about a particular examination session.
 
-### Retrieve Risk Summary
+### Risk Calculation
 
-Calculates and retrieves student risk information from stored events.
+Retrieves stored events and calculates risk information for the student.
 
 ---
 
-## 10. Database and Machine Learning
-
-The database provides examination event information that can also be used by the machine learning module.
+## 9. Data Flow
 
 ```text
-SQLite Events
-      |
-      v
-Extract Browser Features
-      |
-      v
-Machine Learning Model
-      |
-      v
-Prediction
+Browser / Camera / Behaviour Monitoring
+                ↓
+          Risk Analysis
+                ↓
+          Backend API
+                ↓
+          SQLite Database
+                ↓
+       Student Risk Analysis
+                ↓
+             Dashboard
 ```
-
-Browser-event counts such as tab hiding, window blur, copy, paste, cut, fullscreen exit, and total events can be used as machine learning input features.
 
 ---
 
-## 11. Database and Dashboard
+## 10. Database and Multimodal Analysis
 
-The dashboard retrieves processed information from the backend.
+The database stores monitoring information that can be used by the multimodal risk analysis system.
+
+The system combines information from:
+
+* Browser monitoring
+* Camera monitoring
+* Behaviour monitoring
+* Machine learning prediction
+
+The resulting risk information is presented on the dashboard.
+
+---
+
+## 11. Example Stored Event
+
+Example browser event:
 
 ```text
-SQLite Database
-       |
-       v
-FastAPI Backend
-       |
-       v
-Student Risk API
-       |
-       v
-Dashboard
+Student ID: S001
+Event Type: tab_hidden
+Event Time: 2026-09-13T15:23:37.300Z
+Risk Score: 0.70
+Risk Level: HIGH
+Session ID: bf0d0803-091d-401b-aa11-14589f6e1f05
 ```
-
-The dashboard can display:
-
-* Total events
-* High-risk events
-* Medium-risk events
-* Low-risk events
-* Browser risk
-* Camera risk
-* Behaviour risk
-* ML prediction
-* Final risk
-* Event history
 
 ---
 
-## 12. Data Privacy
+## 12. Database Security and Privacy
 
-The SQLite database contains examination monitoring information and should therefore be treated as sensitive project data.
+The project is an academic prototype. Examination monitoring data is stored locally in the SQLite database.
 
-Important considerations:
+The database file is not committed to GitHub because it contains runtime examination data.
 
-* Examination data should be stored securely.
-* Access should be restricted to authorized users.
-* Real student information should not be exposed unnecessarily.
-* Test data should preferably use anonymized student IDs.
-* Runtime database files should not be committed to public repositories.
+The system should be used only with appropriate student awareness and institutional permission.
 
-The project's `.gitignore` excludes:
+---
+
+## 13. Database File and Git
+
+The database file is excluded using `.gitignore`:
 
 ```text
 backend/exam_events.db
 ```
 
-from Git tracking.
+This keeps runtime examination data separate from the source code repository.
 
 ---
 
-## 13. Database Testing
+## 14. Conclusion
 
-The database was tested by verifying:
+SQLite provides a simple and reliable storage layer for the project.
 
-* Browser events are stored.
-* Camera events are stored.
-* Risk scores are stored.
-* Risk levels are stored.
-* Student IDs are stored.
-* Session IDs are stored.
-* Event timestamps are stored.
-* Examination sessions are created.
-* Examination sessions can be ended.
-* Events can be retrieved for a selected session.
+It enables the system to maintain:
 
-### Result
+* Examination sessions
+* Student identifiers
+* Browser events
+* Event timestamps
+* Risk scores
+* Risk levels
+* Session associations
 
-The SQLite database successfully stored and retrieved examination session and monitoring event information.
-
----
-
-## Conclusion
-
-SQLite provides a lightweight local storage solution for the examination monitoring prototype.
-
-The session-based database design ensures that browser, camera, and behavioural events can be associated with the correct examination attempt. The stored information is then used by the risk analysis, machine learning, and dashboard modules.
+This stored information supports the risk analysis and dashboard components of the Multimodal AI-Based Exam Cheating Behaviour Analysis System.
