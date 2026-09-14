@@ -1,245 +1,159 @@
 # Testing Documentation
 
-## Multimodal AI-Based Exam Cheating Behaviour Analysis System
+## 1. Overview
 
-This document describes the testing performed on the major components of the examination monitoring system.
+The **Multimodal AI-Based Exam Cheating Behaviour Analysis System** was tested to verify that its monitoring modules, backend services, database, machine learning prediction, risk analysis, and dashboard work correctly together.
 
----
-
-## 1. Testing Objectives
-
-The main objectives of testing are:
-
-* Verify that each monitoring module works correctly.
-* Verify communication between frontend and backend.
-* Verify that events are stored correctly in the database.
-* Verify risk scores and risk levels.
-* Verify machine learning predictions.
-* Verify session-based event separation.
-* Verify dashboard results.
-* Verify the complete end-to-end system.
+Testing was performed using the complete examination workflow.
 
 ---
 
-## 2. Browser Monitoring Testing
+## 2. Testing Environment
 
-The browser monitoring module was tested by performing different browser interactions during an examination.
-
-### Test Cases
-
-| Test Case | Action               | Expected Result                   | Status |
-| --------- | -------------------- | --------------------------------- | ------ |
-| B01       | Copy text            | `copy` event generated            | PASS   |
-| B02       | Paste text           | `paste` event generated           | PASS   |
-| B03       | Cut text             | `cut` event generated             | PASS   |
-| B04       | Right click          | `right_click` event generated     | PASS   |
-| B05       | Switch tab           | `tab_hidden` event generated      | PASS   |
-| B06       | Return to tab        | `tab_visible` event generated     | PASS   |
-| B07       | Leave browser window | `window_blur` event generated     | PASS   |
-| B08       | Return to browser    | `window_focus` event generated    | PASS   |
-| B09       | Exit fullscreen      | `fullscreen_exit` event generated | PASS   |
-
-### Result
-
-Browser events were successfully detected and sent to the FastAPI backend.
+| Component        | Technology            |
+| ---------------- | --------------------- |
+| Operating System | Windows               |
+| Frontend         | HTML, CSS, JavaScript |
+| Backend          | Python, FastAPI       |
+| Database         | SQLite                |
+| Machine Learning | Scikit-learn          |
+| Browser          | Google Chrome         |
+| Camera           | Webcam                |
+| Audio            | Microphone            |
 
 ---
 
-## 3. Camera Monitoring Testing
+## 3. Browser Monitoring Testing
 
-The camera monitoring module was tested using the system webcam.
+The browser monitoring module was tested using different browser activities.
 
-### Test Cases
+| Test Event         | Expected Result            |
+| ------------------ | -------------------------- |
+| Copy text          | Copy event detected        |
+| Paste text         | Paste event detected       |
+| Cut text           | Cut event detected         |
+| Right click        | Right-click event detected |
+| Switch tab         | Tab hidden event detected  |
+| Return to exam tab | Tab visible event detected |
+| Change window      | Window blur detected       |
+| Return to window   | Window focus detected      |
+| Exit fullscreen    | Fullscreen exit detected   |
 
-| Test Case | Action                | Expected Result               | Status |
-| --------- | --------------------- | ----------------------------- | ------ |
-| C01       | Start camera          | Camera starts successfully    | PASS   |
-| C02       | Face visible          | Face detected                 | PASS   |
-| C03       | Move away from camera | `no_face_detected` event      | PASS   |
-| C04       | Look left             | `looking_left` event          | PASS   |
-| C05       | Look right            | `looking_right` event         | PASS   |
-| C06       | Show mobile phone     | `mobile_phone_detected` event | PASS   |
-
-### Result
-
-The webcam was successfully accessed and visual behaviour events were generated.
-
----
-
-## 4. Microphone Monitoring Testing
-
-The microphone monitoring module was tested using microphone input.
-
-### Test Cases
-
-| Test Case | Action                | Expected Result           | Status |
-| --------- | --------------------- | ------------------------- | ------ |
-| M01       | Start microphone      | Microphone access granted | PASS   |
-| M02       | Remain silent         | Normal audio activity     | PASS   |
-| M03       | Speak near microphone | Talking activity detected | PASS   |
-| M04       | Stop speaking         | Talking event stops       | PASS   |
-
-### Result
-
-The microphone monitoring module successfully detected audio activity and talking behaviour.
+Detected events are sent to the backend and stored in the database.
 
 ---
 
-## 5. Risk Analysis Testing
+## 4. Camera Monitoring Testing
 
-The risk analysis system was tested using different event types.
+The camera monitoring module was tested using different student behaviours.
 
-### Test Cases
+| Test Condition       | Expected Result               |
+| -------------------- | ----------------------------- |
+| Face visible         | Face detected                 |
+| Face not visible     | No-face event detected        |
+| Student looks left   | Looking-left event detected   |
+| Student looks right  | Looking-right event detected  |
+| Student looks away   | Suspicious behaviour detected |
+| Mobile phone visible | Mobile-phone event detected   |
 
-| Event                 | Risk Score | Expected Level | Status |
-| --------------------- | ---------: | -------------- | ------ |
-| Copy                  |        0.3 | LOW            | PASS   |
-| Cut                   |        0.4 | MEDIUM         | PASS   |
-| Paste                 |        0.5 | MEDIUM         | PASS   |
-| Window blur           |        0.6 | MEDIUM         | PASS   |
-| Tab hidden            |        0.7 | HIGH           | PASS   |
-| Mobile phone detected |        0.9 | HIGH           | PASS   |
-
-### Result
-
-Risk scores were correctly converted into LOW, MEDIUM, and HIGH risk levels.
+Camera events are converted into risk scores.
 
 ---
 
-## 6. Database Testing
+## 5. Microphone Monitoring Testing
 
-The SQLite database was tested to verify event and session storage.
+The microphone monitoring module was tested for audio activity.
 
-### Verification Items
-
-* Browser events stored correctly.
-* Camera events stored correctly.
-* Risk scores stored correctly.
-* Risk levels stored correctly.
-* Student ID stored correctly.
-* Session ID stored correctly.
-* Event timestamps stored correctly.
-* Examination sessions stored correctly.
-
-### Result
-
-Monitoring events and examination sessions were successfully stored in SQLite.
+| Test Condition            | Expected Result                 |
+| ------------------------- | ------------------------------- |
+| No talking                | Normal audio state              |
+| Student speaks            | Talking/audio activity detected |
+| Continuous audio activity | Behaviour risk signal generated |
 
 ---
 
-## 7. Exam Session Testing
+## 6. Risk Analysis Testing
 
-Session handling was tested to verify that events from different examination attempts are separated.
+Risk scores were tested using different event types.
 
-### Test Procedure
+| Risk Score  | Risk Level |
+| ----------- | ---------- |
+| 0.0 – 0.39  | LOW        |
+| 0.40 – 0.69 | MEDIUM     |
+| 0.70 – 1.00 | HIGH       |
 
-```text
-Start Exam
-    |
-    v
-Generate Session ID
-    |
-    v
-Generate Monitoring Events
-    |
-    v
-Store Events with Session ID
-    |
-    v
-End Exam
-    |
-    v
-Start New Exam
-    |
-    v
-Generate New Session ID
-```
-
-### Result
-
-Each examination attempt receives a separate session ID, preventing events from different sessions from being mixed.
+The system correctly maps detected event scores to their corresponding risk levels.
 
 ---
 
-## 8. Machine Learning Testing
+## 7. Machine Learning Testing
 
-The machine learning module was tested using the browser-event dataset.
-
-### Algorithm Tested
-
-```text
-Random Forest Classifier
-```
+The Random Forest model was tested using the available browser behaviour features.
 
 ### Input Features
 
-* Tab hidden count
-* Window blur count
-* Copy count
-* Paste count
-* Cut count
-* Fullscreen exit count
-* Total event count
+* Tab hidden
+* Window blur
+* Copy
+* Paste
+* Cut
+* Fullscreen exit
+* Total events
 
-### Test Result
-
-The model successfully produced predictions such as:
+### Expected Output
 
 ```text
 NORMAL
 ```
 
-and
+or
 
 ```text
 CHEATING / SUSPICIOUS
 ```
 
-The ML prediction was successfully integrated into the student risk analysis.
+The ML prediction is displayed in the student risk analysis and dashboard.
 
 ---
 
-## 9. Multimodal Fusion Testing
+## 8. Database Testing
 
-The multimodal fusion system was tested using information from multiple monitoring sources.
+The SQLite database was tested to verify that monitoring information is stored correctly.
 
-### Input Sources
+### Verified Data
 
-```text
-Browser Monitoring
-       +
-Camera Monitoring
-       +
-Microphone Monitoring
-       +
-ML Prediction
-       |
-       v
-Multimodal Risk Analysis
-```
+* Student ID
+* Event type
+* Event time
+* Risk score
+* Risk level
+* Session ID
+* Examination session details
 
-### Verification
+The stored events can be retrieved successfully for risk analysis and dashboard display.
 
-The system successfully combined:
+---
 
-* Browser risk
-* Camera risk
-* Behaviour risk
-* ML prediction
+## 9. API Testing
 
-to produce a final risk assessment.
+The following backend APIs were tested:
 
-### Result
-
-Multimodal information was successfully combined into the final student risk result.
+| Endpoint              | Test Result |
+| --------------------- | ----------- |
+| `/health`             | Passed      |
+| `/api/exam/start`     | Passed      |
+| `/api/exam/end`       | Passed      |
+| `/api/browser-events` | Passed      |
+| `/api/student-risk`   | Passed      |
+| `/api/ml-prediction`  | Passed      |
 
 ---
 
 ## 10. Dashboard Testing
 
-The dashboard was tested to verify that examination results are displayed correctly.
+The dashboard was tested to verify that the monitoring results are displayed correctly.
 
-### Verified Information
+### Verified Dashboard Information
 
 * Total events
 * High-risk events
@@ -250,112 +164,21 @@ The dashboard was tested to verify that examination results are displayed correc
 * Camera risk
 * Behaviour risk
 * ML prediction
-* Final risk
+* ML risk
+* Final risk score
 * Final risk level
 * Event history
 
-### Result
-
-The dashboard successfully displayed the monitoring and risk analysis results.
-
 ---
 
-## 11. Warning and Alert Testing
+## 11. End-to-End Testing
 
-The warning system was tested using high-risk events.
+The complete system was tested using an active examination session.
 
-### Test Cases
-
-| Test Case | Trigger              | Expected Result     | Status |
-| --------- | -------------------- | ------------------- | ------ |
-| A01       | High-risk event      | Red warning overlay | PASS   |
-| A02       | Suspicious behaviour | Speech warning      | PASS   |
-| A03       | High-risk behaviour  | Siren/alert sound   | PASS   |
-
-### Result
-
-Visual and audio warnings were successfully triggered for suspicious behaviour.
-
----
-
-## 12. Backend API Testing
-
-The FastAPI endpoints were tested to verify communication between frontend and backend.
-
-### Tested APIs
-
-| API                   | Method | Purpose                | Status |
-| --------------------- | ------ | ---------------------- | ------ |
-| `/health`             | GET    | Backend health check   | PASS   |
-| `/api/exam/start`     | POST   | Start session          | PASS   |
-| `/api/exam/end`       | POST   | End session            | PASS   |
-| `/api/browser-events` | POST   | Store browser event    | PASS   |
-| `/api/camera-events`  | POST   | Store camera event     | PASS   |
-| `/api/student-risk`   | GET    | Retrieve risk summary  | PASS   |
-| `/api/ml-prediction`  | GET    | Retrieve ML prediction | PASS   |
-
-### Result
-
-The tested API endpoints successfully communicated between the frontend and backend.
-
----
-
-## 13. End-to-End Testing
-
-A complete examination session was performed to verify the integrated system.
-
-### Test Flow
+### Example Test Result
 
 ```text
-Open Examination
-       |
-       v
-Start Exam Session
-       |
-       v
-Generate Session ID
-       |
-       v
-Start Browser Monitoring
-       |
-       v
-Start Camera Monitoring
-       |
-       v
-Start Microphone Monitoring
-       |
-       v
-Generate Behaviour Events
-       |
-       v
-Store Events in SQLite
-       |
-       v
-Calculate Risk
-       |
-       v
-Run ML Prediction
-       |
-       v
-Multimodal Fusion
-       |
-       v
-Display Dashboard
-       |
-       v
-End Exam
-```
-
-### Final Integration Test
-
-A fresh end-to-end test session was successfully completed.
-
-```text
-Session ID:
-bf0d0803-091d-401b-aa11-14589f6e1f05
-
 Total Events: 39
-
 High Risk Events: 9
 Medium Risk Events: 12
 Low Risk Events: 1
@@ -364,42 +187,29 @@ Normal Events: 17
 Browser Risk: 38%
 Camera Risk: 40%
 Behaviour Risk: 38%
-
-ML Prediction:
-CHEATING / SUSPICIOUS
+ML Risk: 0%
 
 Final Risk: 40%
 Final Risk Level: MEDIUM
 ```
 
-### Result
-
-The complete multimodal examination monitoring pipeline successfully worked from examination start through event detection, database storage, risk analysis, machine learning prediction, multimodal fusion, dashboard display, and examination completion.
+The system successfully collected monitoring events, calculated risk scores, generated an ML prediction, performed multimodal risk analysis, and displayed the results on the dashboard.
 
 ---
 
-## 14. Test Summary
+## 12. Test Conclusion
 
-| Module                 | Tested | Result |
-| ---------------------- | ------ | ------ |
-| Exam Interface         | Yes    | PASS   |
-| Session Management     | Yes    | PASS   |
-| Browser Monitoring     | Yes    | PASS   |
-| Camera Monitoring      | Yes    | PASS   |
-| Microphone Monitoring  | Yes    | PASS   |
-| Risk Analysis          | Yes    | PASS   |
-| Machine Learning       | Yes    | PASS   |
-| Multimodal Fusion      | Yes    | PASS   |
-| Backend APIs           | Yes    | PASS   |
-| SQLite Database        | Yes    | PASS   |
-| Dashboard              | Yes    | PASS   |
-| Warning System         | Yes    | PASS   |
-| End-to-End Integration | Yes    | PASS   |
+The testing confirms that the major components of the system work together successfully.
 
----
+The system can:
 
-## 15. Testing Conclusion
+* Monitor browser behaviour.
+* Monitor camera-based behaviour.
+* Monitor microphone activity.
+* Store monitoring events.
+* Calculate risk scores.
+* Generate machine learning predictions.
+* Combine multiple monitoring signals.
+* Display the final assessment through the dashboard.
 
-Testing confirms that the major components of the Multimodal AI-Based Exam Cheating Behaviour Analysis System work together successfully.
-
-The system was tested at module level, API level, database level, and complete end-to-end level. The final integration test confirmed that browser, camera, microphone, machine learning, risk analysis, database, and dashboard components can operate together as a unified examination monitoring system.
+The project is therefore ready for demonstration and further evaluation.
