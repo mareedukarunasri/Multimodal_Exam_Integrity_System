@@ -1,145 +1,75 @@
 # Project Modules
 
-## Multimodal AI-Based Exam Cheating Behaviour Analysis System
+## 1. Student / Exam Interface
 
-This document describes the major modules implemented in the Multimodal AI-Based Exam Cheating Behaviour Analysis System.
+The exam interface provides the environment where the student attends the online examination.
 
----
+### Main Functions
 
-## 1. Exam Interface Module
-
-The Exam Interface provides the environment in which the student attends the online examination.
-
-### Responsibilities
-
-* Displays the examination interface.
-* Starts an examination session.
-* Generates a unique session ID.
-* Enables browser, camera, and microphone monitoring.
-* Provides a controlled environment for examination monitoring.
-* Sends monitoring events to the backend.
+* Displays examination questions.
+* Allows students to submit answers.
+* Starts and ends the examination session.
+* Connects the exam interface with monitoring modules.
+* Maintains the active examination session.
 
 ---
 
-## 2. Exam Session Management Module
+## 2. Browser Monitoring
 
-The Exam Session Management module manages the beginning and end of each examination session.
-
-### Responsibilities
-
-* Creates a unique session ID.
-* Records the student ID.
-* Records session start time.
-* Tracks the session status.
-* Records session end time.
-* Associates monitoring events with the correct examination session.
-
-### Example
-
-```text
-Student S001
-     |
-     v
-Start Exam
-     |
-     v
-Generate Session ID
-     |
-     v
-Monitor Student
-     |
-     v
-End Exam
-```
-
-Session-based monitoring prevents events from different examination attempts from being mixed together.
-
----
-
-## 3. Browser Monitoring Module
-
-The Browser Monitoring module detects suspicious browser and user interaction events during the examination.
+The browser monitoring module detects suspicious browser-related activities during the examination.
 
 ### Detected Events
 
-* Tab hidden
-* Tab visible
-* Window blur
-* Window focus
-* Copy
-* Paste
-* Cut
-* Right click
-* Fullscreen exit
+| Event           | Description                    |
+| --------------- | ------------------------------ |
+| Copy            | Student copies content         |
+| Paste           | Student pastes content         |
+| Cut             | Student cuts content           |
+| Right Click     | Student performs a right-click |
+| Tab Hidden      | Exam tab becomes hidden        |
+| Tab Visible     | Exam tab becomes visible       |
+| Window Blur     | Exam window loses focus        |
+| Window Focus    | Exam window regains focus      |
+| Fullscreen Exit | Student exits fullscreen mode  |
 
-### Example
-
-```text
-Student switches to another tab
-              |
-              v
-       tab_hidden event
-              |
-              v
-        Risk calculation
-              |
-              v
-       Event stored in DB
-```
-
-Browser events are sent to the FastAPI backend and stored in the SQLite database.
+Each detected event is assigned a risk score and stored in the database.
 
 ---
 
-## 4. Camera Monitoring Module
+## 3. Camera Monitoring
 
-The Camera Monitoring module uses the student's webcam to identify suspicious visual behaviour.
+The camera monitoring module analyzes the student's visual behaviour using the webcam.
 
-### Responsibilities
+### Detection Capabilities
 
-* Accesses the webcam.
-* Detects the presence of a face.
-* Detects absence of a face.
-* Detects head movement.
-* Detects looking-left behaviour.
-* Detects looking-right behaviour.
-* Detects mobile phone usage.
-* Generates camera-based risk events.
+* Face detection
+* No-face detection
+* Looking-left detection
+* Looking-right detection
+* Looking-away behaviour
+* Mobile phone detection
 
-### Examples of Events
-
-```text
-no_face_detected
-looking_left
-looking_right
-mobile_phone_detected
-```
-
-Camera monitoring provides the visual component of the multimodal system.
+Camera events are converted into risk scores and sent to the backend for further analysis.
 
 ---
 
-## 5. Microphone Monitoring Module
+## 4. Microphone Monitoring
 
-The Microphone Monitoring module analyzes audio activity during the examination.
+The microphone monitoring module observes audio activity during the examination.
 
-### Responsibilities
+### Detection
 
-* Accesses the microphone.
-* Measures microphone activity.
-* Detects voice/talking activity.
-* Generates talking-related events.
-* Sends relevant behaviour information to the backend.
+* Detects voice or talking activity.
+* Generates an audio-related risk signal.
+* Supports multimodal behaviour analysis.
 
-This module provides an additional behavioural signal that cannot be obtained from browser or camera monitoring alone.
+The microphone module provides an additional behavioural signal along with browser and camera monitoring.
 
 ---
 
-## 6. Risk Analysis Module
+## 5. Risk Analysis
 
-The Risk Analysis module assigns risk scores to detected events.
-
-Each detected event is assigned a risk score based on its potential relevance to suspicious examination behaviour.
+The risk analysis module calculates risk scores from detected events.
 
 ### Risk Levels
 
@@ -149,153 +79,74 @@ Each detected event is assigned a risk score based on its potential relevance to
 | 0.40 – 0.69 | MEDIUM     |
 | 0.70 – 1.00 | HIGH       |
 
-### Example
-
-```text
-copy                 -> 0.3 -> LOW
-paste                -> 0.5 -> MEDIUM
-window_blur          -> 0.6 -> MEDIUM
-tab_hidden           -> 0.7 -> HIGH
-mobile_phone_detected -> 0.9 -> HIGH
-```
-
-Risk scores from multiple monitoring sources are used to calculate the student's overall risk.
+Higher risk scores indicate a greater possibility of suspicious examination behaviour.
 
 ---
 
-## 7. Machine Learning Module
+## 6. Machine Learning Prediction
 
-The Machine Learning module predicts whether the observed browser behaviour is normal or suspicious.
-
-### Algorithm
-
-The current implementation uses:
-
-**Random Forest Classifier**
+The project uses a **Random Forest Classifier** for machine-learning-based behaviour prediction.
 
 ### Input Features
 
-The model uses browser-related features such as:
+* Tab hidden events
+* Window blur events
+* Copy events
+* Paste events
+* Cut events
+* Fullscreen exit events
+* Total browser events
 
-* tab hidden count
-* window blur count
-* copy count
-* paste count
-* cut count
-* fullscreen exit count
-* total event count
+### Prediction Output
 
-### Output
+The ML model predicts:
 
-The model produces a prediction such as:
+* **NORMAL**
+* **CHEATING / SUSPICIOUS**
 
-```text
-NORMAL
-```
-
-or
-
-```text
-CHEATING / SUSPICIOUS
-```
-
-The model is trained using the project's browser-event dataset.
+The ML prediction is used as an additional signal during multimodal risk assessment.
 
 ---
 
-## 8. Multimodal Fusion Module
+## 7. Multimodal Risk Fusion
 
-The Multimodal Fusion module combines information from multiple monitoring sources.
+The multimodal fusion module combines information from different monitoring sources.
 
-### Input Modalities
+### Input Signals
 
-```text
-Browser Monitoring
-       |
-Camera Monitoring
-       |
-Microphone Monitoring
-       |
-Machine Learning Prediction
-       |
-       v
-Multimodal Fusion
-       |
-       v
-Final Risk Analysis
-```
+* Browser risk
+* Camera risk
+* Behaviour risk
+* ML prediction
+* ML risk
 
-The system does not depend on a single signal. Instead, information from different modalities contributes to the final assessment.
+The combined information is used to generate the final student risk assessment.
 
 ---
 
-## 9. Backend API Module
+## 8. Database Module
 
-The backend is implemented using **FastAPI**.
+The system uses **SQLite** to store examination monitoring data.
 
-It provides APIs for communication between the frontend monitoring system, database, risk analysis components, and machine learning module.
+### Stored Information
 
-### Main APIs
-
-```text
-POST /api/exam/start
-POST /api/exam/end
-
-POST /api/browser-events
-POST /api/camera-events
-
-GET /api/student-risk
-GET /api/ml-prediction
-
-GET /health
-```
-
-The backend validates incoming information and processes monitoring events.
-
----
-
-## 10. Database Module
-
-The project uses **SQLite** for local event and session storage.
-
-### Main Data
-
-The database stores:
-
-* Browser events
-* Camera events
-* Risk scores
-* Risk levels
 * Student ID
+* Event type
+* Event time
+* Risk score
+* Risk level
 * Session ID
-* Event timestamps
 * Examination session information
 
-### Database Flow
-
-```text
-Monitoring Event
-       |
-       v
-FastAPI Backend
-       |
-       v
-SQLite Database
-       |
-       v
-Risk Analysis
-       |
-       v
-Dashboard
-```
+The database allows monitoring events and student risk information to be retrieved for dashboard analysis.
 
 ---
 
-## 11. Dashboard Module
+## 9. Dashboard
 
-The Dashboard provides a visual summary of the examination monitoring results.
+The dashboard provides a centralized view of the examination monitoring results.
 
-### Displays
+### Dashboard Information
 
 * Total events
 * High-risk events
@@ -306,140 +157,66 @@ The Dashboard provides a visual summary of the examination monitoring results.
 * Camera risk
 * Behaviour risk
 * ML prediction
-* Final risk
-* Event history
+* ML risk
+* Final risk score
+* Final risk level
+* Detected events
 
-The dashboard allows an evaluator or administrator to understand the student's examination behaviour.
-
----
-
-## 12. Warning and Alert Module
-
-The system provides real-time warnings when suspicious behaviour is detected.
-
-### Alert Types
-
-* Visual warning overlay
-* Speech warning
-* Siren/alert sound
-
-For high-risk behaviour, the system can display a prominent warning to the student.
-
-Example:
-
-```text
-Suspicious Behaviour Detected
-Please return to the examination.
-```
-
-This module provides immediate feedback instead of waiting until the examination is completed.
+The dashboard helps the examiner understand the overall behaviour and risk status of a student.
 
 ---
 
-## 13. Event Logging Module
+## 10. Backend API
 
-Every detected monitoring event is recorded with important information.
+The backend is implemented using **FastAPI**.
 
-### Example Event
+### Main API Operations
 
-```text
-Student ID: S001
-Event Type: mobile_phone_detected
-Risk Score: 0.9
-Risk Level: HIGH
-Event Time: 2026-09-14T10:20:00
-Session ID: <exam-session-id>
-```
-
-Event logging allows the system to maintain an auditable history of examination behaviour.
+| API                   | Purpose                         |
+| --------------------- | ------------------------------- |
+| `/api/exam/start`     | Start an examination session    |
+| `/api/exam/end`       | End an examination session      |
+| `/api/browser-events` | Store browser monitoring events |
+| `/api/student-risk`   | Calculate student risk          |
+| `/api/ml-prediction`  | Generate ML prediction          |
+| `/health`             | Check backend status            |
 
 ---
 
-## 14. Student Risk Summary Module
-
-The Student Risk Summary module combines the available monitoring information to calculate an overall risk assessment.
-
-### Risk Components
+## 11. Overall Processing Flow
 
 ```text
-Browser Risk
-     +
-Camera Risk
-     +
-Behaviour Risk
-     +
-ML Prediction
-     |
-     v
-Final Risk
-```
-
-The final result is categorized into levels such as:
-
-```text
-NORMAL
-LOW
-MEDIUM
-HIGH
+Student
+   ↓
+Exam Interface
+   ↓
+Multimodal Monitoring
+   ├── Browser Monitoring
+   ├── Camera Monitoring
+   └── Microphone Monitoring
+   ↓
+Risk Analysis
+   ↓
+Machine Learning Prediction
+   ↓
+Multimodal Risk Fusion
+   ↓
+Monitoring Dashboard
 ```
 
 ---
 
-## 15. Privacy and Ethical Monitoring Module
+## 12. Module Summary
 
-The system is designed as an academic examination-monitoring prototype.
-
-Important considerations include:
-
-* Monitoring should be performed with appropriate user consent.
-* Camera and microphone access should be clearly communicated.
-* Collected examination data should be protected.
-* Risk predictions should be treated as indicators rather than absolute proof of cheating.
-* Human review should be considered before taking disciplinary action.
-* The system should avoid unnecessary collection of personal information.
-
----
-
-## Overall Module Architecture
-
-```text
-                    EXAM INTERFACE
-                          |
-            +-------------+-------------+
-            |             |             |
-            v             v             v
-       BROWSER         CAMERA       MICROPHONE
-       MONITORING      MONITORING    MONITORING
-            |             |             |
-            +-------------+-------------+
-                          |
-                          v
-                   FASTAPI BACKEND
-                          |
-                          v
-                    SQLITE DATABASE
-                          |
-              +-----------+-----------+
-              |                       |
-              v                       v
-        RISK ANALYSIS          ML PREDICTION
-              |                       |
-              +-----------+-----------+
-                          |
-                          v
-                  MULTIMODAL FUSION
-                          |
-                          v
-                   FINAL RISK SCORE
-                          |
-                          v
-                     DASHBOARD
-```
-
----
-
-## Conclusion
-
-The project combines browser monitoring, camera-based analysis, microphone activity detection, risk scoring, machine learning, database storage, and multimodal fusion into a single examination integrity system.
-
-The modular architecture allows individual components to be improved or replaced independently while maintaining communication through the backend API layer.
+| Module                | Main Purpose                            |
+| --------------------- | --------------------------------------- |
+| Exam Interface        | Conducts the online examination         |
+| Browser Monitoring    | Detects suspicious browser activity     |
+| Camera Monitoring     | Detects visual suspicious behaviour     |
+| Microphone Monitoring | Detects audio/talking activity          |
+| Risk Analysis         | Calculates risk scores                  |
+| ML Prediction         | Predicts normal or suspicious behaviour |
+| Multimodal Fusion     | Combines multiple risk signals          |
+| Database              | Stores monitoring information           |
+| Backend API           | Handles system communication            |
+| Dashboard             | Displays monitoring and risk results    |
